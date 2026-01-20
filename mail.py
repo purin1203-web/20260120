@@ -3,19 +3,20 @@ import time
 
 # 1. 페이지 기본 설정
 st.set_page_config(
-    page_title="나의 꽃, 나의 전공 찾기",
-    page_icon="🌸",
+    page_title="덕새와 함께하는 전공 찾기",
+    page_icon="🦆",
     layout="centered"
 )
 
-# 2. 감성적인 UI를 위한 커스텀 CSS (덕성 버건디 & 파스텔 무드)
+# 2. 감성적 UI + 덕새 활용을 위한 커스텀 CSS
 st.markdown("""
     <style>
-    /* 전체 배경 및 폰트 설정 */
+    /* 전체 배경 및 폰트 설정 (Noto Sans KR 적용) */
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;500;700&display=swap');
     
     .stApp {
-        background: linear-gradient(135deg, #fff0f5 0%, #fff 100%);
+        /* 덕성 버건디와 핑크를 활용한 부드러운 그라데이션 */
+        background: linear-gradient(135deg, #fff0f5 0%, #ffffff 100%);
         font-family: 'Noto Sans KR', sans-serif;
     }
     
@@ -27,58 +28,73 @@ st.markdown("""
         margin-bottom: 20px;
     }
     
-    /* 카드 디자인 */
+    /* 덕새 이미지 스타일 클래스 */
+    .deoksae-main {
+        display: block;
+        margin: 0 auto 20px auto;
+        max-width: 250px;
+        height: auto;
+        filter: drop-shadow(5px 5px 10px rgba(142, 27, 62, 0.2)); /* 부드러운 그림자 */
+    }
+
+    /* 메인 카드 디자인 */
     .question-card {
-        background-color: white;
+        background-color: rgba(255, 255, 255, 0.95);
         padding: 30px;
-        border-radius: 20px;
-        box-shadow: 0 10px 25px rgba(142, 27, 62, 0.1);
+        border-radius: 25px;
+        box-shadow: 0 10px 30px rgba(142, 27, 62, 0.1);
         text-align: center;
         margin-bottom: 30px;
+        border: 2px solid #fff0f5;
     }
     
     /* 버튼 스타일 */
     .stButton>button {
         width: 100%;
-        border-radius: 15px;
-        height: 60px;
+        border-radius: 20px;
+        height: 65px;
         background-color: white;
         color: #555;
         border: 2px solid #FFD1DC;
         font-size: 16px;
+        font-weight: 500;
         transition: all 0.3s ease;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     }
     
     .stButton>button:hover {
-        background-color: #FFD1DC;
+        background-color: #fff0f5;
         color: #8E1B3E;
         border-color: #8E1B3E;
-        transform: translateY(-2px);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(142, 27, 62, 0.15);
     }
 
     /* 결과 카드 스타일 */
     .result-card {
         background: white;
-        border-radius: 15px;
+        border-radius: 20px;
         padding: 25px;
-        margin-top: 15px;
-        border-left: 8px solid #8E1B3E;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        margin-top: 20px;
+        border: 1px solid #eee;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     }
     
     .rank-badge {
         background-color: #8E1B3E;
         color: white;
-        padding: 5px 15px;
+        padding: 8px 15px;
         border-radius: 20px;
-        font-size: 0.8em;
+        font-size: 0.9em;
         font-weight: bold;
+        display: inline-block;
+        margin-bottom: 10px;
     }
     </style>
 """, unsafe_allow_html=True)
 
+# --- (이전 코드와 동일한 데이터 영역) ---
 # 3. 데이터 정의 (덕성여대 단과대 및 전공 분류 기반 재구성)
-# 실제 로직을 위해 성향(key)을 매핑합니다.
 majors_db = {
     "HUMAN": {
         "name": "인문과학 & 글로벌융합",
@@ -112,13 +128,13 @@ majors_db = {
     }
 }
 
-# 4. 세션 상태 초기화 (점수 저장용)
+# 4. 세션 상태 초기화
 if 'scores' not in st.session_state:
     st.session_state.scores = {"HUMAN": 0, "SOCIAL": 0, "BIZ": 0, "TECH": 0, "ART": 0}
 if 'step' not in st.session_state:
     st.session_state.step = 0
 
-# 5. 질문 리스트 (간소화된 알고리즘)
+# 5. 질문 리스트
 questions = [
     {
         "q": "Q1. 주말 오후, 나에게 가장 힐링이 되는 시간은?",
@@ -174,23 +190,28 @@ def next_step(type_key):
 
 # --- 메인 화면 로직 ---
 
-# 1) 시작 화면
+# 1) 시작 화면 (덕새 등장!)
 if st.session_state.step == 0:
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    st.markdown("<h1>🌸 덕성, 너의 꿈이 피어나는 곳 🌸</h1>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+    # [중요] 실제 사용 시 아래 src를 "static/deoksae_welcome.png"로 변경하세요.
+    st.markdown("""
+        <img src="https://via.placeholder.com/300x250.png/FFD1DC/8E1B3E?text=Deoksae+Welcome!" class="deoksae-main">
+    """, unsafe_allow_html=True)
+    
+    st.markdown("<h1>🌸 덕새와 함께 찾는 나의 꽃길 🌸</h1>", unsafe_allow_html=True)
     st.markdown(
         """
         <div class='question-card'>
-            <p style='font-size: 1.2em; color: #555;'>
-                반가워요, 25학번 새내기 여러분! 👋<br>
-                아직 전공 선택이 고민되시나요?<br><br>
-                몇 가지 간단한 질문을 통해<br>
-                <b>나에게 가장 잘 어울리는 전공</b>을 찾아드릴게요.
+            <p style='font-size: 1.2em; color: #555; line-height: 1.6;'>
+                반가워요, 25학번 새내기 여러분! 🦆<br>
+                저 <b>덕새</b>가 여러분의 전공 고민을 덜어드릴게요.<br><br>
+                가벼운 마음으로 몇 가지 질문에 답해보세요.<br>
+                당신에게 딱 맞는 <b>전공 꽃길</b>을 찾아드릴게요!
             </p>
         </div>
         """, unsafe_allow_html=True
     )
-    if st.button("내 전공 찾기 시작하기 ✨"):
+    if st.button("덕새랑 전공 찾으러 가기! ✨"):
         st.session_state.step = 1
         st.rerun()
 
@@ -199,11 +220,16 @@ elif st.session_state.step <= len(questions):
     q_idx = st.session_state.step - 1
     cur_q = questions[q_idx]
 
-    # 진행바
+    # 진행바 표시 (커스텀 컬러 적용은 Streamlit 기본 기능 한계로 어려움)
     progress = q_idx / len(questions)
     st.progress(progress)
     
-    st.markdown(f"<div class='question-card'><h3>{cur_q['q']}</h3></div>", unsafe_allow_html=True)
+    st.markdown(f"""
+        <div class='question-card' style='margin-top: 20px;'>
+            <span style='font-size: 3em;'>🤔</span>
+            <h3 style='color: #8E1B3E; margin-top: 10px;'>{cur_q['q']}</h3>
+        </div>
+    """, unsafe_allow_html=True)
 
     # 답변 버튼들
     for answer_text, type_key in cur_q['a']:
@@ -211,10 +237,16 @@ elif st.session_state.step <= len(questions):
             next_step(type_key)
             st.rerun()
 
-# 3) 결과 화면
+# 3) 결과 화면 (덕새 축하!)
 else:
     st.balloons() # 축하 효과
-    st.markdown("<h1>🎉 당신을 위한 전공 레시피 🎉</h1>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+    # [중요] 실제 사용 시 아래 src를 "static/deoksae_party.png"로 변경하세요.
+    st.markdown("""
+        <img src="https://via.placeholder.com/300x250.png/FFD1DC/8E1B3E?text=Deoksae+Party!" class="deoksae-main">
+    """, unsafe_allow_html=True)
+
+    st.markdown("<h1>🎉 덕새가 추천하는 전공 레시피 🎉</h1>", unsafe_allow_html=True)
     
     # 점수 정렬 (높은 순)
     sorted_scores = sorted(st.session_state.scores.items(), key=lambda x: x[1], reverse=True)
@@ -223,37 +255,38 @@ else:
     st.write("---")
     st.markdown(
         """
-        <div style='text-align: center; color: #666; margin-bottom: 20px;'>
-            덕성에서의 4년이 가장 빛날 수 있도록,<br>
-            AI가 분석한 <b>최적의 전공 TOP 3</b>를 소개합니다.
+        <div style='text-align: center; color: #666; margin-bottom: 20px; font-size: 1.1em;'>
+            "너의 가능성은 무궁무진해!"<br>
+            덕새가 분석한 <b>최적의 전공 TOP 3</b>를 소개할게. 🦆💕
         </div>
         """, unsafe_allow_html=True
     )
 
-    # 순위별 출력
-    ranks = ["🥇 1순위 추천", "🥈 2순위 추천", "🥉 3순위 추천"]
+    # 순위별 출력 (덕새 뱃지 적용)
+    ranks = ["🦆 덕새 Pick! 1순위", "🥈 2순위 추천", "🥉 3순위 추천"]
     
     for i, (m_key, score) in enumerate(top_3):
         data = majors_db[m_key]
         
-        # 1순위는 조금 더 강조
-        border_color = "#8E1B3E" if i == 0 else "#ddd"
-        bg_color = "#fff0f5" if i == 0 else "white"
+        # 1순위 강조 스타일
+        border_style = "3px solid #8E1B3E" if i == 0 else "1px solid #FFD1DC"
+        bg_color = "#fffafa" if i == 0 else "white"
         
         st.markdown(f"""
-            <div class="result-card" style="border-left: 8px solid {border_color}; background-color: {bg_color};">
+            <div class="result-card" style="border: {border_style}; background-color: {bg_color};">
                 <span class="rank-badge">{ranks[i]}</span>
-                <h2 style="color: #333; margin-top: 10px;">{data['name']}</h2>
-                <p style="font-size: 1.1em;">{data['desc']}</p>
-                <hr style="border-top: 1px dashed #bbb;">
-                <p><b>🎓 관련 전공:</b> {', '.join(data['majors'])}</p>
+                <h2 style="color: #333; margin-top: 15px; font-weight: 700;">{data['name']}</h2>
+                <p style="font-size: 1.15em; color: #555; line-height: 1.5;">{data['desc']}</p>
+                <hr style="border-top: 1px dashed #bbb; margin: 20px 0;">
+                <p style='margin-bottom: 10px;'><b>🎓 관련 전공:</b> <span style='color: #8E1B3E;'>{', '.join(data['majors'])}</span></p>
                 <p><b>💼 추천 진로:</b> {', '.join(data['careers'])}</p>
             </div>
         """, unsafe_allow_html=True)
 
     # 다시하기 버튼
     st.write("")
-    if st.button("🔄 테스트 다시 하기"):
+    st.write("")
+    if st.button("🔄 덕새랑 다시 한번 찾아볼까?"):
         st.session_state.scores = {k:0 for k in st.session_state.scores}
         st.session_state.step = 0
         st.rerun()
